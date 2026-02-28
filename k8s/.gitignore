@@ -1,0 +1,2 @@
+# real secrets (keep local/server only)
+k8s/02-secrets/db-secret.yaml

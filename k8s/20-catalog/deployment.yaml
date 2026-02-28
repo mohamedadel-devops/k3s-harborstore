@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  namespace: harborstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:16
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+          command: ["bash", "-lc"]
+          args:
+            - |
+              echo "Waiting for Postgres..."
+              until psql -h postgres -U "$(cat /etc/pguser)" -d harborstore -c "SELECT 1;" >/dev/null 2>&1; do
+                sleep 2
+              done
+              echo "Postgres is reachable."
+          volumeMounts:
+            - name: pguser
+              mountPath: /etc/pguser
+              subPath: POSTGRES_USER
+      containers:
+        - name: catalog
+          image: hashicorp/http-echo:1.0
+          args:
+            - "-listen=:8080"
+            - "-text=Catalog service is up. Postgres connectivity check passed."
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: pguser
+          secret:
+            secretName: postgres-secret
+            items:
+              - key: POSTGRES_USER
+                path: POSTGRES_USER

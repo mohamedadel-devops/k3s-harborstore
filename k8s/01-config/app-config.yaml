@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: harborstore-config
+  namespace: harborstore
+data:
+  CATALOG_PORT: "8080"
+  CART_PORT: "8081"
+  GATEWAY_PORT: "8082"
+  REDIS_HOST: "redis"
+  POSTGRES_HOST: "postgres"
+  POSTGRES_DB: "harborstore"

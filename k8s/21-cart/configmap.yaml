@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cart-config
+  namespace: harborstore
+data:
+  APP_PORT: "8081"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"

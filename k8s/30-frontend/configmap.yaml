@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-html
+  namespace: harborstore
+data:
+  index.html: |
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>HarborStore</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; }
+          .card { padding: 16px; border: 1px solid #ddd; border-radius: 12px; max-width: 720px; }
+          button { padding: 10px 14px; border-radius: 10px; border: 1px solid #ccc; cursor: pointer; }
+          pre { background: #f7f7f7; padding: 12px; border-radius: 10px; overflow: auto; }
+        </style>
+      </head>
+      <body>
+        <h1>HarborStore</h1>
+        <div class="card">
+          <p>Frontend served by NGINX in Kubernetes.</p>
+          <p>API calls go through Ingress → Gateway → services.</p>
+
+          <button onclick="callApi('/api/catalog/')">Call /api/catalog</button>
+          <button onclick="callApi('/api/cart/')">Call /api/cart</button>
+
+          <h3>Response</h3>
+          <pre id="out">Click a button...</pre>
+        </div>
+
+        <script>
+          async function callApi(path) {
+            const out = document.getElementById('out');
+            out.textContent = 'Loading...';
+            try {
+              const res = await fetch(path, { method: 'GET' });
+              const text = await res.text();
+              out.textContent = `GET ${path}\n\n${text}`;
+            } catch (e) {
+              out.textContent = `Error: ${e}`;
+            }
+          }
+        </script>
+      </body>
+    </html>

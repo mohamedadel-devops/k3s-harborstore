@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-nginx-config
+  namespace: harborstore
+data:
+  nginx.conf: |
+    events {}
+
+    http {
+      server {
+        listen 8082;
+
+        # Simple health endpoint for probes
+        location = /healthz {
+          return 200 "ok\n";
+          add_header Content-Type text/plain;
+        }
+
+        # Route to Catalog service
+        # We keep it simple: /api/catalog -> http://catalog/
+        location /catalog/ {
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_pass http://catalog/;
+        }
+
+        # If user hits /api/catalog without trailing slash, redirect to add it
+        location = /catalog {
+          return 301 /catalog/;
+        }
+
+        # Route to Cart service
+        location /cart/ {
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_pass http://cart/;
+        }
+
+        location = /cart {
+          return 301 /cart/;
+        }
+      }
+    }
