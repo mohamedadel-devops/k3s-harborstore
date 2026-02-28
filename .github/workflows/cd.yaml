@@ -1,0 +1,43 @@
+name: CD - Deploy HarborStore to k3s
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH (Bash on remote)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.K3S_HOST }}
+          username: ${{ secrets.K3S_USER }}
+          key: ${{ secrets.K3S_SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            DEPLOY_DIR=~/deploy/k3s-harborstore
+            REPO_URL=https://github.com/${{ github.repository }}.git
+
+            # Clone or update repo
+            if [ ! -d "$DEPLOY_DIR/.git" ]; then
+              mkdir -p ~/deploy
+              git clone "$REPO_URL" "$DEPLOY_DIR"
+            else
+              cd "$DEPLOY_DIR"
+              git fetch --all
+              git reset --hard origin/main
+            fi
+
+            cd "$DEPLOY_DIR"
+
+            # Ensure real secret exists on the SERVER (not in GitHub)
+            if [ ! -f k8s/02-secrets/db-secret.yaml ]; then
+              echo "❌ Missing k8s/02-secrets/db-secret.yaml on server."
+              echo "Create it on the control plane from db-secret.example.yaml and set a real password."
+              exit 1
+            fi
+
+            # Deploy
+            ./scripts/deploy.sh
