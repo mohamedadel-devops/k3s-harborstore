@@ -27,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # your deploy steps here...
+      # your deploy steps here....
       - name: Deploy via SSH (Bash on remote)
         uses: appleboy/ssh-action@v1.0.3
         with:
