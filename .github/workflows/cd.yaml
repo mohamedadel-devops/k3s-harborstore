@@ -2,10 +2,18 @@ name: CD - Deploy HarborStore to k3s (Production)
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch / tag / SHA to deploy (leave empty to deploy the default branch)"
+        required: false
+        default: ""
 
 concurrency:
   group: cd-production
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
