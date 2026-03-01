@@ -1,13 +1,25 @@
-name: CD - Deploy HarborStore to k3s
+name: CD - Deploy HarborStore to k3s (Production)
 
 on:
-  push:
-    branches: ["main"]
+  workflow_dispatch:
+
+concurrency:
+  group: cd-production
+  cancel-in-progress: true
 
 jobs:
   deploy:
+    name: Deploy to Production
     runs-on: ubuntu-latest
+
+    # Must match the Environment name you created in GitHub UI
+    environment: production
+
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # your deploy steps here...
       - name: Deploy via SSH (Bash on remote)
         uses: appleboy/ssh-action@v1.0.3
         with:
