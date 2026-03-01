@@ -1,13 +1,33 @@
-name: CD - Deploy HarborStore to k3s
+name: CD - Deploy HarborStore to k3s (Production)
 
 on:
-  push:
-    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch / tag / SHA to deploy (leave empty to deploy the default branch)"
+        required: false
+        default: ""
+
+concurrency:
+  group: cd-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
+    name: Deploy to Production
     runs-on: ubuntu-latest
+
+    
+    environment: production
+
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # your deploy steps here....
       - name: Deploy via SSH (Bash on remote)
         uses: appleboy/ssh-action@v1.0.3
         with:

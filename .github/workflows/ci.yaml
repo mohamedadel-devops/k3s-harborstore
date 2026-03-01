@@ -1,16 +1,21 @@
 name: CI - Validate Kubernetes Manifests
 
 on:
-  push:
-    branches: ["main"]
   pull_request:
+    branches: ["main"]
+
+  push:
+    branches-ignore: ["main"]
 
 jobs:
-  validate-yaml:
+  validate:
+    name: Validate Manifests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Keep your existing validation steps below...name: CI - Validate Kubernetes Manifests
 
       - name: Validate YAML syntax (Python)
         run: |
