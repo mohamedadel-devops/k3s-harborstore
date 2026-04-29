@@ -147,5 +147,5 @@ This project showcases:
 # 👨‍💻 Author
 
 Mohamed Adel Asar\
-DevOps Engineer (Aspiring)\
+DevOps Engineer \
 AWS \| Kubernetes \| CI/CD \| Linux
